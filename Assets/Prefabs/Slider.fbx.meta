@@ -1,51 +1,38 @@
 fileFormatVersion: 2
-guid: 72246c2a06e51af41ae7862b262dda89
-timeCreated: 1499072982
+guid: f8deaa91714af43438241d7107ac0ad8
+timeCreated: 1499536914
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
     100000: pCube1
-    100002: pCube10
-    100004: pCube11
-    100006: pCube2
-    100008: pCube3
-    100010: pCube5
-    100012: pCube6
-    100014: pCube9
-    100016: //RootNode
-    100018: transform1
-    100020: transform2
-    100022: transform3
-    100024: transform4
-    100026: transform5
-    100028: transform6
-    100030: transform7
+    100002: pCube2
+    100004: pCylinder1
+    100006: pCylinder2
+    100008: polySurface1
+    100010: //RootNode
+    100012: transform1
+    100014: transform2
+    100016: transform3
+    100018: transform4
     400000: pCube1
-    400002: pCube10
-    400004: pCube11
-    400006: pCube2
-    400008: pCube3
-    400010: pCube5
-    400012: pCube6
-    400014: pCube9
-    400016: //RootNode
-    400018: transform1
-    400020: transform2
-    400022: transform3
-    400024: transform4
-    400026: transform5
-    400028: transform6
-    400030: transform7
-    2300000: pCube11
-    3300000: pCube11
-    4300000: pCube11
-    6400000: pCube11
-    9500000: //RootNode
+    400002: pCube2
+    400004: pCylinder1
+    400006: pCylinder2
+    400008: polySurface1
+    400010: //RootNode
+    400012: transform1
+    400014: transform2
+    400016: transform3
+    400018: transform4
+    2300000: polySurface1
+    3300000: polySurface1
+    4300000: polySurface1
+    6400000: polySurface1
   materials:
     importMaterials: 1
-    materialName: 2
-    materialSearch: 0
+    materialName: 0
+    materialSearch: 1
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
@@ -87,7 +74,7 @@ ModelImporter:
     normalSmoothAngle: 60
     normalImportMode: 0
     tangentImportMode: 3
-  importAnimation: 0
+  importAnimation: 1
   copyAvatar: 0
   humanDescription:
     serializedVersion: 2
@@ -103,7 +90,7 @@ ModelImporter:
     rootMotionBoneName: 
     rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
     hasTranslationDoF: 0
-    hasExtraRoot: 1
+    hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   animationType: 0

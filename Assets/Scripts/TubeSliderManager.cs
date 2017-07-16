@@ -8,13 +8,12 @@ public class TubeSliderManager : MonoBehaviour, IManipulationHandler
 {
 
 	[SerializeField]
-	public int SliderMinimumValue = 0;
+	public uint SliderMinimumValue = 0;
 
 	[SerializeField]
-	public int SliderMaximumValue = 100;
+	public uint SliderMaximumValue = 100;
 
-	[SerializeField]
-	public static int CurrentValue = 10;
+	public uint CurrentValue = 4;
 
 	[SerializeField]
 	float DragSpeed = 1.5f;
@@ -37,11 +36,11 @@ public class TubeSliderManager : MonoBehaviour, IManipulationHandler
 	private GameObject rightHolder;
 	private GameObject button;
 
-	private string leftLabel;
+    private string leftLabel;
 	private string rightLabel;
 	private string buttonLabel;
 
-	private int SliderRange;
+	private uint SliderRange;
 	private float TotalDistance;
 	private float CurrentDistance;
 
@@ -52,10 +51,11 @@ public class TubeSliderManager : MonoBehaviour, IManipulationHandler
 	{
 		isManipulationTriggered = false;
 
-		if (GameObject.Find ("Button") != null) {
-			button = GameObject.Find ("Button");
+		if (GameObject.FindGameObjectWithTag ("SliderButton") != null) {
+			button = GameObject.FindGameObjectWithTag ("SliderButton");
 			button.GetComponent<Renderer> ().material.color = ButtonColorOffFocus;
 		}
+			
 	}
 
 	public Color buttonColorOffFocus {
@@ -74,15 +74,13 @@ public class TubeSliderManager : MonoBehaviour, IManipulationHandler
 
 	public void OnManipulationStarted(ManipulationEventData eventData)
 	{
-		if (GameObject.Find ("Button") != null) 
+		if (GameObject.FindGameObjectWithTag ("SliderButton") != null) 
 		{
-			leftHolder = GameObject.Find ("LeftHolder");
-			rightHolder = GameObject.Find ("RightHolder");
-			button = GameObject.Find ("Button");
-			button.GetComponent<Renderer> ().material.color = ButtonColorOnFocus;
+			leftHolder = GameObject.FindGameObjectWithTag ("LeftHolder");
+			rightHolder = GameObject.FindGameObjectWithTag ("RightHolder");
+			button = GameObject.FindGameObjectWithTag ("SliderButton");
 
-			SliderRange = SliderMaximumValue - SliderMinimumValue;
-			TotalDistance = Vector3.Distance (leftHolder.transform.position, rightHolder.transform.position);
+            button.GetComponent<Renderer> ().material.color = ButtonColorOnFocus;
 
 			InputManager.Instance.PushModalInputHandler(button);
 
@@ -90,7 +88,9 @@ public class TubeSliderManager : MonoBehaviour, IManipulationHandler
 
 			lastPosition = button.transform.position;
 
-			isManipulationTriggered = true;
+            setDisplay(SliderMinimumValue.ToString(), SliderMaximumValue.ToString(), CurrentValue.ToString());
+
+            isManipulationTriggered = true;
 		}
 	}
 
@@ -99,24 +99,31 @@ public class TubeSliderManager : MonoBehaviour, IManipulationHandler
 		
 		if (isManipulationTriggered) 
 		{
+			
 			button.GetComponent<Renderer> ().material.color = ButtonColorOnFocus;
+
+
+			SliderRange = SliderMaximumValue - SliderMinimumValue;
+
+			Vector3 startPos = leftHolder.transform.position;
+			Vector3 endPos = rightHolder.transform.position;
+
+			TotalDistance = Vector3.Distance (startPos, endPos);
 
 			Drag (eventData.CumulativeDelta);
 
-			CurrentDistance = Vector3.Distance (leftHolder.transform.position, button.transform.position);
+			CurrentDistance = Vector3.Distance (startPos, button.transform.position);
 
-			CurrentValue = Mathf.RoundToInt(((CurrentDistance / TotalDistance) * SliderRange));
+			CurrentValue = (uint) Mathf.RoundToInt(((CurrentDistance / TotalDistance) * SliderRange));
 
 			if (CurrentValue <= SliderRange / 2) {
-				CurrentValue -= Mathf.RoundToInt (button.transform.localScale.x);
+				CurrentValue -= (uint) Mathf.RoundToInt (button.transform.localScale.x);
 			} else {
-				CurrentValue += Mathf.RoundToInt (button.transform.localScale.x);
+				CurrentValue += (uint) Mathf.RoundToInt (button.transform.localScale.x);
 			}
 
-			leftHolder.GetComponentInChildren<TextMesh> ().text = SliderMinimumValue.ToString();
-			rightHolder.GetComponentInChildren<TextMesh> ().text = SliderMaximumValue.ToString();
-			button.GetComponentInChildren<TextMesh> ().text = CurrentValue.ToString();
-		}
+            setDisplay(SliderMinimumValue.ToString(), SliderMaximumValue.ToString(), CurrentValue.ToString());
+        }
 			
 	}
 
@@ -125,9 +132,7 @@ public class TubeSliderManager : MonoBehaviour, IManipulationHandler
 		if (isManipulationTriggered) 
 		{
 			button.GetComponent<Renderer> ().material.color = ButtonColorOffFocus;
-			leftHolder.GetComponentInChildren<TextMesh> ().text = "";
-			rightHolder.GetComponentInChildren<TextMesh> ().text = "";
-			button.GetComponentInChildren<TextMesh> ().text = "";
+            setDisplay("", "", "");
 
 			InputManager.Instance.PopModalInputHandler();
 
@@ -163,15 +168,27 @@ public class TubeSliderManager : MonoBehaviour, IManipulationHandler
 	public void ButtonOnFocus() 
 	{
 		button.GetComponent<Renderer> ().material.color = ButtonColorOnFocus;
-	}
+        button.GetComponentInChildren<TextMesh>().text = CurrentValue.ToString();
+
+    }
 
 	public void ButtonOffFocus() 
 	{
 		if (!isManipulationTriggered) 
 		{
 			button.GetComponent<Renderer> ().material.color = ButtonColorOffFocus;
-		}
-	}
+            
+        }
+
+        button.GetComponentInChildren<TextMesh>().text = "";
+    }
+
+    public void setDisplay(string min, string max, string current)
+    {
+        leftHolder.transform.parent.GetComponentInChildren<TextMesh>().text = min;
+        rightHolder.transform.parent.GetComponentInChildren<TextMesh>().text = max;
+        button.GetComponentInChildren<TextMesh>().text = current;
+    }
 
 }
 

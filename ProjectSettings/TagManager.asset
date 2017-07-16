@@ -4,8 +4,9 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Holder
   - SliderButton
+  - RightHolder
+  - LeftHolder
   layers:
   - Default
   - TransparentFX

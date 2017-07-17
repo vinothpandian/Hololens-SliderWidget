@@ -7,6 +7,7 @@ TagManager:
   - SliderButton
   - RightHolder
   - LeftHolder
+  - ButtonPivot
   layers:
   - Default
   - TransparentFX

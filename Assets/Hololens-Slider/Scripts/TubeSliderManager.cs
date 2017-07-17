@@ -4,16 +4,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class TubeSliderManager : MonoBehaviour, IManipulationHandler
+public class TubeSliderManager : MonoBehaviour
 {
 
 	[SerializeField]
 	public uint SliderMinimumValue = 0;
+    public string SliderMinimumLabel;
 
 	[SerializeField]
 	public uint SliderMaximumValue = 100;
+    public string SliderMaximumLabel;
 
-	public uint CurrentValue = 4;
+    public uint CurrentValue = 4;
 
 	[SerializeField]
 	float DragSpeed = 1.5f;
@@ -35,6 +37,7 @@ public class TubeSliderManager : MonoBehaviour, IManipulationHandler
 	private GameObject leftHolder;
 	private GameObject rightHolder;
 	private GameObject button;
+    private GameObject buttonPivot;
 
     private string leftLabel;
 	private string rightLabel;
@@ -43,19 +46,36 @@ public class TubeSliderManager : MonoBehaviour, IManipulationHandler
 	private uint SliderRange;
 	private float TotalDistance;
 	private float CurrentDistance;
+    private Vector3 startPos;
+    private Vector3 endPos;
+    private float diff;
 
-	private bool isManipulationTriggered;
+
+    private bool isSliderManipulationTriggered;
 
 
 	void Awake()
 	{
-		isManipulationTriggered = false;
+		isSliderManipulationTriggered = false;
 
-		if (GameObject.FindGameObjectWithTag ("SliderButton") != null) {
-			button = GameObject.FindGameObjectWithTag ("SliderButton");
-			button.GetComponent<Renderer> ().material.color = ButtonColorOffFocus;
-		}
-			
+        leftHolder = GameObject.FindGameObjectWithTag("LeftHolder");
+        rightHolder = GameObject.FindGameObjectWithTag("RightHolder");
+        button = GameObject.FindGameObjectWithTag("SliderButton");
+        buttonPivot = GameObject.FindGameObjectWithTag("ButtonPivot");
+
+        SliderRange = SliderMaximumValue - SliderMinimumValue;
+
+        startPos = leftHolder.transform.position;
+        endPos = rightHolder.transform.position;
+
+        TotalDistance = Vector3.Distance(startPos, endPos);
+
+        diff = Vector3.Distance(button.transform.position, buttonPivot.transform.position);
+
+        button.transform.position = startPos + (-button.transform.up.normalized * (((float)CurrentValue / (float)SliderRange)+2f*diff) * TotalDistance);
+
+        button.GetComponent<Renderer>().material.color = ButtonColorOffFocus;
+
 	}
 
 	public Color buttonColorOffFocus {
@@ -72,87 +92,68 @@ public class TubeSliderManager : MonoBehaviour, IManipulationHandler
 				ButtonColor.ButtonColorOnFocusArr[i] = ButtonColorOnFocus[i]; }
 	}
 
-	public void OnManipulationStarted(ManipulationEventData eventData)
+	public void ManipulationStarted(ManipulationEventData eventData)
 	{
-		if (GameObject.FindGameObjectWithTag ("SliderButton") != null) 
+       
+		if (!isSliderManipulationTriggered) 
 		{
-			leftHolder = GameObject.FindGameObjectWithTag ("LeftHolder");
-			rightHolder = GameObject.FindGameObjectWithTag ("RightHolder");
-			button = GameObject.FindGameObjectWithTag ("SliderButton");
-
             button.GetComponent<Renderer> ().material.color = ButtonColorOnFocus;
 
 			InputManager.Instance.PushModalInputHandler(button);
 
 			rb = button.GetComponent<Rigidbody>();
 
-			lastPosition = button.transform.position;
+			lastPosition = buttonPivot.transform.position;
 
-            setDisplay(SliderMinimumValue.ToString(), SliderMaximumValue.ToString(), CurrentValue.ToString());
+            setDisplay(SliderMinimumLabel, SliderMaximumLabel, CurrentValue.ToString());
 
-            isManipulationTriggered = true;
+            isSliderManipulationTriggered = true;
 		}
 	}
 
-	public void OnManipulationUpdated(ManipulationEventData eventData)
+	public void ManipulationUpdated(ManipulationEventData eventData)
 	{
 		
-		if (isManipulationTriggered) 
+		if (isSliderManipulationTriggered) 
 		{
 			
 			button.GetComponent<Renderer> ().material.color = ButtonColorOnFocus;
 
-
-			SliderRange = SliderMaximumValue - SliderMinimumValue;
-
-			Vector3 startPos = leftHolder.transform.position;
-			Vector3 endPos = rightHolder.transform.position;
-
-			TotalDistance = Vector3.Distance (startPos, endPos);
-
 			Drag (eventData.CumulativeDelta);
 
-			CurrentDistance = Vector3.Distance (startPos, button.transform.position);
+			CurrentDistance = Vector3.Distance (startPos, buttonPivot.transform.position);
 
 			CurrentValue = (uint) Mathf.RoundToInt(((CurrentDistance / TotalDistance) * SliderRange));
 
-			if (CurrentValue <= SliderRange / 2) {
-				CurrentValue -= (uint) Mathf.RoundToInt (button.transform.localScale.x);
-			} else {
-				CurrentValue += (uint) Mathf.RoundToInt (button.transform.localScale.x);
-			}
-
-            setDisplay(SliderMinimumValue.ToString(), SliderMaximumValue.ToString(), CurrentValue.ToString());
+            setDisplay(SliderMinimumLabel, SliderMaximumLabel, CurrentValue.ToString());
         }
 			
 	}
 
-	public void OnManipulationCompleted(ManipulationEventData eventData)
+	public void ManipulationCompleted(ManipulationEventData eventData)
 	{
-		if (isManipulationTriggered) 
+		if (isSliderManipulationTriggered) 
 		{
 			button.GetComponent<Renderer> ().material.color = ButtonColorOffFocus;
             setDisplay("", "", "");
 
 			InputManager.Instance.PopModalInputHandler();
 
-			isManipulationTriggered = false;
+			isSliderManipulationTriggered = false;
 		}
 
 	}
 
-	public void OnManipulationCanceled(ManipulationEventData eventData)
+	public void ManipulationCanceled(ManipulationEventData eventData)
 	{
-		if (isManipulationTriggered) 
+		if (isSliderManipulationTriggered) 
 		{
 			button.GetComponent<Renderer> ().material.color = ButtonColorOffFocus;
-			leftHolder.GetComponentInChildren<TextMesh> ().text = "";
-			rightHolder.GetComponentInChildren<TextMesh> ().text = "";
-			button.GetComponentInChildren<TextMesh> ().text = "";
+            setDisplay("", "", "");
 
-			InputManager.Instance.PopModalInputHandler();
+            InputManager.Instance.PopModalInputHandler();
 
-			isManipulationTriggered = false;
+			isSliderManipulationTriggered = false;
 		}
 	}
 
@@ -174,7 +175,7 @@ public class TubeSliderManager : MonoBehaviour, IManipulationHandler
 
 	public void ButtonOffFocus() 
 	{
-		if (!isManipulationTriggered) 
+		if (!isSliderManipulationTriggered) 
 		{
 			button.GetComponent<Renderer> ().material.color = ButtonColorOffFocus;
             

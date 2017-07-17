@@ -10,12 +10,10 @@ public class VolumeControl : MonoBehaviour {
 	void Awake () {
         audioSource = GetComponent<AudioSource>();
         audioSource.volume = SliderConnection.Value / 100f;
-        Debug.Log(audioSource.volume);
 	}
 	
 	// Update is called once per frame
 	void Update () {
         audioSource.volume = SliderConnection.Value / 100f;
-        Debug.Log(audioSource.volume);
     }
 }

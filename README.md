@@ -12,6 +12,8 @@ _Mini Project for Designing Interactive Systems, RWTH_
 * [Using the Hololens Slider widget](using-the-hololens-slider-widget)
 * [Building and Deploying the HoloLens Application in Hololens Emulator](building-and-deploying-the-hololens-application-in-hololens-emulator)
 
+[Most common errors and their solutions](most-common-errors-and-their-solutions)
+
 ## Unity asset package
 Please find the recent Unity asset package in [Release folder](https://github.com/vinothpandian/Hololens-SliderWidget/tree/master/Release)
 
@@ -65,3 +67,8 @@ Please find the recent Unity asset package in [Release folder](https://github.co
 	 - Click on the arrow next to the Device button, and select **HoloLens Emulator**.
 	 - Click **Debug -> Start Without debugging** or press **Ctrl + F5**.
 	 - After some time the emulator will start with your project.
+
+## Most common errors and their solutions
+
+ - UnassignedReferenceException: The variable Slider of SliderConnection has not been assigned.
+	- Solution: Drag the **Hololens-Slider** from the Scene and drop it on the Slider option in **Slider Connection** script

@@ -3,16 +3,18 @@
 _Mini Project for Designing Interactive Systems, RWTH_
 
 ## Table of Contents
-[Unity asset package](unity-asset-package)
+[Unity asset package](#unity-asset-package)
 
-[Getting Started](getting-started)
-* [Importing Assets](importing-assets)
-* [Setting up the scene for Hololens development](setting-up-the-scene-for-hololens-development)
-* [Using the Holotoolkit Input and Cursor Manager](using-the-holotoolkit-input-and-cursor-manager)
-* [Using the Hololens Slider widget](using-the-hololens-slider-widget)
-* [Building and Deploying the HoloLens Application in Hololens Emulator](building-and-deploying-the-hololens-application-in-hololens-emulator)
+[Getting Started](#getting-started)
+* [Importing Assets](#importing-assets)
+* [Setting up the scene for Hololens development](#setting-up-the-scene-for-hololens-development)
+* [Using the Holotoolkit Input and Cursor Manager](#using-the-holotoolkit-input-and-cursor-manager)
+* [Using the Hololens Slider widget](#using-the-hololens-slider-widget)
+* [Building and Deploying the HoloLens Application in Hololens Emulator](#building-and-deploying-the-hololens-application-in-hololens-emulator)
 
-[Most common errors and their solutions](most-common-errors-and-their-solutions)
+[Most common errors and their solutions](#most-common-errors-and-their-solutions)
+
+---
 
 ## Unity asset package
 Please find the recent Unity asset package in [Release folder](https://github.com/vinothpandian/Hololens-SliderWidget/tree/master/Release)

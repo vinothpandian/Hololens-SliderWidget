@@ -8,6 +8,7 @@ TagManager:
   - RightHolder
   - LeftHolder
   - ButtonPivot
+  - RightPivotBound
   layers:
   - Default
   - TransparentFX

@@ -15,15 +15,15 @@ public class TubeSliderManager : MonoBehaviour
     public uint SliderMaximumValue = 100;
     public string SliderMaximumLabel;
 
-    public uint CurrentValue = 4;
+    public uint CurrentValue = 50;
+
+    public bool isCurrentValueToBeDisplayed = true;
 
     public Stats ButtonColor;
     public Color ButtonColorOffFocus;
     public Color ButtonColorOnFocus;
 
     private Rigidbody rb;
-
-    Vector3 lastPosition;
 
     private GameObject leftHolder;
     private GameObject rightHolder;
@@ -34,43 +34,51 @@ public class TubeSliderManager : MonoBehaviour
     private string rightLabel;
     private string buttonLabel;
 
-    private uint SliderRange;
-    private float TotalDistance;
-    private float CurrentDistance;
-    private Vector3 startPos;
-    private Vector3 endPos;
-    private float diff;
-
-    private Vector3 lineVector;
-
     private bool isSliderManipulationTriggered;
-    private Vector3 lastDeltaPosition;
 
+    private uint SliderRange;
 
+    private Vector3 start;
+    private Vector3 end;
+    private Vector3 sliderVector;
+    private Vector3 prevPosition;
+    private Vector3 movementDistance;
+    private Vector3 newPosition;
+    private float angleMinBound;
+    private float angleMaxBound;
+    private Vector3 newPositionVector;
+    private float diff;
 
     void Awake()
     {
         isSliderManipulationTriggered = false;
 
-        leftHolder = GameObject.FindGameObjectWithTag("LeftHolder");
-        rightHolder = GameObject.FindGameObjectWithTag("RightHolder");
-        button = GameObject.FindGameObjectWithTag("SliderButton");
-        buttonPivot = GameObject.FindGameObjectWithTag("ButtonPivot");
+        foreach (Transform child in transform)
+        {
+           
+            switch(child.tag)
+            {
+                case "LeftHolder": leftHolder = child.gameObject;
+                    break;
+                case "RightHolder":
+                    rightHolder = child.gameObject;
+                    break;
+                case "SliderButton":
+                    button = child.gameObject;
+                    break;
+            }
+        }
 
         SliderRange = SliderMaximumValue - SliderMinimumValue;
 
-        startPos = leftHolder.transform.position;
-        endPos = rightHolder.transform.position;
+        start = leftHolder.transform.position;
+        end = rightHolder.transform.position;
 
-        TotalDistance = Vector3.Distance(startPos, endPos);
+        sliderVector = end - start;
 
-        diff = Vector3.Distance(button.transform.position, buttonPivot.transform.position);
+        diff = button.GetComponent<BoxCollider>().bounds.size.x;
 
-        button.transform.position = startPos + (-button.transform.up.normalized * (((float)CurrentValue / (float)SliderRange) + 2f * diff) * (TotalDistance - 2f * diff));
-        
-        lineVector = startPos - endPos;
-
-        
+        button.transform.position = start + (-button.transform.up.normalized * (((float)CurrentValue / (float)SliderRange)) * (sliderVector.magnitude));
 
         button.GetComponent<Renderer>().material.color = ButtonColorOffFocus;
 
@@ -98,8 +106,6 @@ public class TubeSliderManager : MonoBehaviour
         }
     }
 
-    public float RangePosition { get; private set; }
-
     public void ManipulationStarted(ManipulationEventData eventData)
     {
 
@@ -111,9 +117,11 @@ public class TubeSliderManager : MonoBehaviour
 
             rb = button.GetComponent<Rigidbody>();
 
-            lastPosition = button.transform.position;
 
-            lastDeltaPosition = eventData.CumulativeDelta;
+
+            prevPosition = button.transform.position;
+
+
 
             setDisplay(SliderMinimumLabel, SliderMaximumLabel, CurrentValue.ToString());
 
@@ -129,38 +137,20 @@ public class TubeSliderManager : MonoBehaviour
 
             button.GetComponent<Renderer>().material.color = ButtonColorOnFocus;
 
-            Vector3 newPosition;
+            movementDistance = Vector3.Project(eventData.CumulativeDelta, sliderVector.normalized);
+            newPosition = prevPosition + movementDistance;
 
-            Vector3 mvmt = Vector3.Project(eventData.CumulativeDelta, lineVector.normalized);
+            newPositionVector = newPosition - start;
 
-            float deltaMovement = Vector3.Distance(mvmt, lastDeltaPosition);
+            angleMinBound = AngleDir(transform.forward, newPositionVector, transform.up);
+            angleMaxBound = AngleDir(transform.forward, end - newPosition, transform.up);
 
-            float angleOfMovement = Vector3.Angle(eventData.CumulativeDelta, lineVector.normalized);
-
-            Debug.DrawLine(mvmt, lastDeltaPosition, Color.red, 2, false);
-
-            if (angleOfMovement < 90)
-            {
-                newPosition = lastPosition + (button.transform.up.normalized * deltaMovement);
-            }
-            else
-            {
-                newPosition = lastPosition + (button.transform.up.normalized * -deltaMovement);
-            }
-
-            float angleMinBound = Vector3.Angle(lineVector.normalized, startPos - newPosition);
-            float angleMaxBound = Vector3.Angle(lineVector.normalized, endPos - newPosition);
-
-
-            if (angleMinBound < 90 && angleMaxBound > 90)
+            if (angleMinBound != -1f && angleMaxBound != -1f)
             {
                 button.transform.position = newPosition;
+                CurrentValue = (uint)Mathf.RoundToInt((float)SliderRange * ((newPositionVector.magnitude) / (sliderVector.magnitude)));
             }
-
-            //  Value calculation
-            CurrentDistance = Vector3.Distance(startPos, buttonPivot.transform.position);
-
-            CurrentValue = (uint)Mathf.RoundToInt((((CurrentDistance / (TotalDistance - 2f * diff) ) ) * SliderRange));
+            
 
             setDisplay(SliderMinimumLabel, SliderMaximumLabel, CurrentValue.ToString());
         }
@@ -197,7 +187,10 @@ public class TubeSliderManager : MonoBehaviour
     public void ButtonOnFocus()
     {
         button.GetComponent<Renderer>().material.color = ButtonColorOnFocus;
-        button.GetComponentInChildren<TextMesh>().text = CurrentValue.ToString();
+        if (isCurrentValueToBeDisplayed)
+        {
+            button.GetComponentInChildren<TextMesh>().text = CurrentValue.ToString();
+        }
 
     }
 
@@ -214,12 +207,33 @@ public class TubeSliderManager : MonoBehaviour
 
     public void setDisplay(string min, string max, string current)
     {
-        leftHolder.transform.parent.GetComponentInChildren<TextMesh>().text = min;
-        rightHolder.transform.parent.GetComponentInChildren<TextMesh>().text = max;
-        button.GetComponentInChildren<TextMesh>().text = current;
+        if(isCurrentValueToBeDisplayed)
+        {
+            leftHolder.transform.parent.GetComponentInChildren<TextMesh>().text = min;
+            rightHolder.transform.parent.GetComponentInChildren<TextMesh>().text = max;
+            button.GetComponentInChildren<TextMesh>().text = current;
+        }
+        
     }
 
+    float AngleDir(Vector3 fwd, Vector3 targetDir, Vector3 up)
+    {
+        Vector3 perp = Vector3.Cross(fwd, targetDir);
+        float dir = Vector3.Dot(perp, up);
 
+        if (dir > 0f)
+        {
+            return 1f;
+        }
+        else if (dir < 0f)
+        {
+            return -1f;
+        }
+        else
+        {
+            return 0f;
+        }
+    }
 }
 
 

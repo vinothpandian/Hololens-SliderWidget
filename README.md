@@ -53,7 +53,7 @@ Please find the recent Unity asset package in [Release folder](https://github.co
  - In the Inspector Panel, choose **Add Component**
  - Type "sliderconnection" and click on the "**Slider Connection" script** to add it.
  - Drag the **Hololens-Slider** from the Scene and drop it on the Slider option in **Slider Connection** script
- - Now in the GameObject script you can use **SliderConnection.Value** to get the Slider widge current value
+ - Now in the GameObject script you can create a function **void GetSliderValue(uint value)** to get the Slider widge current value (as the value is sent using the SendMessage Unity function from Slider Connection script
 
 ### Building and Deploying the HoloLens Application in Hololens Emulator
  - Select **File > Build Settings** and select **Windows Store** option.

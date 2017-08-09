@@ -3,6 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+/// <summary>
+/// Implements the Manipulation handler and focusable handler from HoloToolkit and passes the event to the TubeSliderManager on each event trigger
+/// </summary>
 public class ButtonHandler : MonoBehaviour, IFocusable, IManipulationHandler
 {
 
